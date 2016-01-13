@@ -19,9 +19,11 @@ var logger = {
   error: debug('node-phantom-simple:error')
 };
 
+var _q = [];
+
 var queue = function (worker) {
-  var _q = [];
   var running = false;
+  _q = [];
   var q = {
     push: function (obj) {
       _q.push(obj);
@@ -556,6 +558,10 @@ exports.create = function (options, callback) {
 
       on: function () {
         phantom.on.apply(phantom, arguments);
+      },
+
+      queue: function () {
+          return _q;
       }
     };
 
