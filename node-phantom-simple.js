@@ -428,8 +428,9 @@ exports.create = function (options, callback) {
 
       phantom.POSTING = true;
 
+      var errorsCodes = [500];
       var req = http.request(http_opts, function (res) {
-        var err = res.statusCode === 500 ? true : false;
+        var err = errorsCodes.indexOf(res.statusCode) !== -1;
         var data = '';
 
         res.setEncoding('utf8');
@@ -467,7 +468,7 @@ exports.create = function (options, callback) {
             }
 
             next();
-            callback(error);
+            callback(new HeadlessError('JSON parse on req with data: ' + data + ', error: ' + error + ', method: ' + method));
             return;
           }
 
