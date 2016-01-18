@@ -33,7 +33,7 @@ function watchdog_clear() {
   clearTimeout(watchdog_timer_id);
 
   watchdog_timer_id = setTimeout(function () {
-    phantom.exit(0);
+    // phantom.exit(0);
   }, WATCHDOG_TIMEOUT);
 }
 
@@ -93,7 +93,7 @@ function include_js (res, page, args) {
 
 webserver.listen('127.0.0.1:0', function (req, res) {
   // Update watchdog timer on every request
-  watchdog_clear();
+//   watchdog_clear();
 
   if (req.method === 'GET') {
     res.statusCode = 200;
@@ -250,7 +250,7 @@ var global_methods = {
 };
 
 // Start watchdog timer
-watchdog_clear();
+// watchdog_clear();
 
 /*eslint-disable no-console*/
 console.log('Ready [' + system.pid + '] [' + webserver.port + ']');

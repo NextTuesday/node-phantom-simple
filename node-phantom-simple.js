@@ -428,7 +428,7 @@ exports.create = function (options, callback) {
 
       phantom.POSTING = true;
 
-      var errorsCodes = [500];
+      var errorsCodes = [403, 500];
       var req = http.request(http_opts, function (res) {
         var err = errorsCodes.indexOf(res.statusCode) !== -1;
         var data = '';
@@ -600,7 +600,7 @@ function setup_long_poll (phantom, port, pages, setup_new_page) {
         data += chunk;
       });
       res.on('end', function () {
-        var results;
+        var results = [];
 
         if (dead) {
           cb(new HeadlessError('Phantom Process died'));
@@ -653,13 +653,13 @@ function setup_long_poll (phantom, port, pages, setup_new_page) {
       if (dead || phantom.killed) { return; }
 
       if (err.code === 'ECONNRESET' || err.code === 'ECONNREFUSED') {
-        try {
-          phantom.kill();
-        } catch (e) {
-          // we don't care
-        }
-        dead = true;
-        cb(new HeadlessError('Phantom Process died'));
+        // try {
+        //   phantom.kill();
+        // } catch (e) {
+        //   // we don't care
+        // }
+        // dead = true;
+        cb(new HeadlessError('Phantom Process res: ' + err));
         return;
       }
 
