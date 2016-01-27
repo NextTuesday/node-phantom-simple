@@ -1,3 +1,15 @@
+2.2.4 / 2016-01-26
+------------------
+
+- Fix: parse 127.0.0.0/8 properly, #115, thanks to @janl.
+
+
+2.2.3 / 2016-01-17
+------------------
+
+- Allow engine options to be an array to pass in verbatim keys and values.
+
+
 2.2.2 / 2015-12-30
 ------------------
 

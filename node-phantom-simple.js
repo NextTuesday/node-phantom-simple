@@ -128,9 +128,13 @@ exports.create = function (options, callback) {
   function spawnPhantom (callback) {
     var args = [];
 
-    Object.keys(options.parameters).forEach(function (parm) {
-      args.push('--' + parm + '=' + options.parameters[parm]);
-    });
+    if (Array.isArray(options.parameters)) {
+      args = options.parameters;
+    } else {
+      Object.keys(options.parameters).forEach(function (parm) {
+        args.push('--' + parm + '=' + options.parameters[parm]);
+      });
+    }
 
     args = args.concat([ path.join(__dirname, 'bridge.js') ]);
 
@@ -238,7 +242,7 @@ exports.create = function (options, callback) {
           stdout = '';
         }
 
-        var re = /(?:127\.0\.0\.1|localhost):(\d+)/ig, match;
+        var re = /(?:127\.\d{1,3}\.\d{1,3}\.\d{1,3}|localhost):(\d+)/ig, match;
         var ports = [];
 
         while ((match = re.exec(stdout)) !== null) {
