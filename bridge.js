@@ -154,23 +154,50 @@ var callbacks = [
 ];
 
 function setup_callbacks (id, page) {
-  callbacks.forEach(function (cb) {
-    page[cb] = function (parm) {
-      var args = Array.prototype.slice.call(arguments);
+	if (callbacks.indexOf('onInitialized') === -1) {
+		callbacks.push('onInitialized');
+	}
 
-      if ((cb === 'onResourceRequested') && (parm.url.indexOf('data:image') === 0)) {
-        return;
-      }
+	callbacks.forEach(function (cb) {
+		page[cb] = function (parm) {
+			var args = Array.prototype.slice.call(arguments);
 
-      if (cb === 'onClosing') { args = []; }
-      callback_stack.push({ 'page_id': id, 'callback': cb, 'args': args });
-    };
-  });
-  // Special case this
-  page.onPageCreated = function (page) {
-    var new_id = setup_page(page);
-    callback_stack.push({ 'page_id': id, 'callback': 'onPageCreated', 'args': [ new_id ] });
-  };
+			if (cb === 'onInitialized') {
+				page.evaluate(function() {
+					var htmlAddEventListener = HTMLElement.prototype.addEventListener;
+					HTMLElement.prototype.addEventListener = function(name, cb) {
+						HTMLElement.boundEvents || (HTMLElement.boundEvents = {});
+						(HTMLElement.boundEvents[name] || (HTMLElement.boundEvents[name] = [])).push(cb + '');
+						return htmlAddEventListener.apply(this, arguments);
+					}
+					var documentAddEventListener = Document.prototype.addEventListener;
+					Document.prototype.addEventListener = function(name, cb) {
+						Document.boundEvents || (Document.boundEvents = {});
+						(Document.boundEvents[name] || (Document.boundEvents[name] = [])).push(cb + '');
+						return documentAddEventListener.apply(this, arguments);
+					}
+					var windowAddEventListener = window.addEventListener;
+					window.addEventListener = function(name, cb) {
+						window.boundEvents || (window.boundEvents = {});
+						(window.boundEvents[name] || (window.boundEvents[name] = [])).push(cb + '');
+						return windowAddEventListener.apply(this, arguments);
+					}
+				});
+			}
+
+			if ((cb === 'onResourceRequested') && (parm.url.indexOf('data:image') === 0)) {
+				return;
+			}
+
+			if (cb === 'onClosing') { args = []; }
+			callback_stack.push({ 'page_id': id, 'callback': cb, 'args': args });
+		};
+	});
+	// Special case this
+	page.onPageCreated = function(page) {
+		var new_id = setup_page(page);
+		callback_stack.push({ 'page_id': id, 'callback': 'onPageCreated', 'args': [ new_id ] });
+	};
 }
 
 function setup_page (page) {
