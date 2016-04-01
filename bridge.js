@@ -182,6 +182,15 @@ function setup_callbacks (id, page) {
 						(window.boundEvents[name] || (window.boundEvents[name] = [])).push(cb + '');
 						return windowAddEventListener.apply(this, arguments);
 					}
+					var windowOpen = window.open;
+					window.open = function (url, name, features) {
+						// set name if missing here
+						name = name || 'default_window_name';
+
+						(window.boundUrls || (window.boundUrls = [])).push(url);
+						return url;
+						// return windowOpen.apply(this, arguments);
+					};
 				});
 			}
 
